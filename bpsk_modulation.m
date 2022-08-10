@@ -17,15 +17,14 @@ t = (0:dt:StopTime-dt)';
 
 s = square_wave(data, Eb, T, t); %generating square wave from input data
 
-y = modulation(s, Fc, t);
-r = ft_awgn(y, 0, 10*log10(Eb/T));
-%r = ft_awgn(y, 0, Eb);
-output = demodulation(r, Fc, t);
+y = modulation(s, Fc, t); %modulating the signal
+r = ft_awgn(y, 0, 10*log10(Eb/T)); %additive white gaussian noise
+output = demodulation(r, Fc, t); %demodulating the signal
 
 m = square_wave(output, Eb, T, t);
 
 figure;
-%plotting input data as square waveform
+%plotting input as square waveform
 subplot(4,1,1);
 plot(t, s, 'LineWidth', 2);
 title('Input');
@@ -46,7 +45,7 @@ title('Received signal (signal with gaussian noise)');
 xlabel('Time(seconds)');
 ylabel('Amplitude');
 
-%plotting input data as square waveform
+%plotting output as square waveform
 subplot(4,1,4);
 plot(t, m, 'LineWidth', 2);
 title('Output');
@@ -84,7 +83,8 @@ function dem = demodulation(r, Fc, t)
     end
 end
 
-function k = ft_awgn(y, snr, pwr) %implementation of additive white gaussian noise channel
+%implementation of additive white gaussian noise channel (clone of awgn function)
+function k = ft_awgn(y, snr, pwr) 
     pnoise = pwr - snr;
     p = power(10, pnoise / 10);
     k = y + sqrt(p) .* randn(length(y), 1); %creating gaussian noise and adding it to the signal
